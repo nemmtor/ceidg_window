@@ -1,0 +1,4 @@
+__pycache__
+wyniki/*.xls
+wyniki/*.xlsx
+wyniki/*.csv
