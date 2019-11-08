@@ -1,4 +1,5 @@
 from zeep import Client, Settings
+from config_parser import config
 
 
 
@@ -18,7 +19,7 @@ class Api:
     def apiRequest(self, dateFrom, dateTo, **kwargs):
         '''Send request to API.'''
         return self.client.service.GetMigrationData201901(
-            self.token, DateFrom=dateFrom, DateTo=dateTo, **kwargs)
+            config.readApiToken(), DateFrom=dateFrom, DateTo=dateTo, **kwargs)
 
     @classmethod
     def validateToken(cls, token):
