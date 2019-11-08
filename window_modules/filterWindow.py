@@ -1,11 +1,15 @@
-from window import Window
 import tkinter as tk
-from config import font12
+from .mainWindow import Window
 from api_call import api
 from parse_answer import parseAnswer
 
 
 class Filter(Window):
+    def __init__(self, title):
+        super().__init__(title)
+        self.createWidgets()
+
+
     def createWidgets(self):
         main_frame = tk.Frame(self.root)
         dateFrom_label = tk.Label(main_frame, text='Data od:')
@@ -15,7 +19,7 @@ class Filter(Window):
         self.dateTo_entry = tk.Entry(
             main_frame, width=10)
         submit = tk.Button(main_frame, text='Filtruj', width=10,
-                           padx=10, font=font12,
+                           padx=10, font=Window.useFont(12),
                            command=lambda: self.filterRequest())
 
         dateFrom_label.pack()

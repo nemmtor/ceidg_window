@@ -1,25 +1,33 @@
-from zeep import Client
+from zeep import Client, Settings
 
 
 
 
 
 class Api:
+    '''Class variables'''
+    url = 'http://datastore.ceidg.gov.pl/CEIDG.DataStore/services/'
+    url += 'DataStoreProvider201901.svc?singleWsdl'
+    settings = Settings(strict=False, xml_huge_tree=True)
+    client = Client(url, settings=settings)
+
     def __init__(self):
-        url = 'http://datastore.ceidg.gov.pl/CEIDG.DataStore/services/'
-        url += 'DataStoreProvider201901.svc?singleWsdl'
-        self.client = Client(url)
+        # print('Starting API...')
+        pass
 
     def apiRequest(self, dateFrom, dateTo, **kwargs):
+        '''Send request to API.'''
         return self.client.service.GetMigrationData201901(
             self.token, DateFrom=dateFrom, DateTo=dateTo, **kwargs)
 
-    def validateToken(self, token):
-        self.token = token
+    @classmethod
+    def validateToken(cls, token):
+        '''Check if given token is correct. Function needs to check if response
+        message is in list of error messages from API.'''
         errors = ['Wystąpił błąd. Skontaktuj się z dostawcą usługi.',
         'Niewłaściwy identyfikator użytkownika']
-        self.response = self.client.service.GetMigrationData201901(self.token)
-        if self.response in errors or len(self.response) == 23:
+        response = cls.client.service.GetMigrationData201901(token)
+        if response in errors or len(response) == 23:
             return False
         else:
             return True
