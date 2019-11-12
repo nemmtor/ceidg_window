@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 import xlwt
 
 
-def parseAnswer(answer):
+def parseAnswer(answer, withPhones):
         wb = xlwt.Workbook()
         sheet = wb.add_sheet('Wynik', cell_overwrite_ok=True)
         sheet.write(0, 0, 'NIP')
@@ -20,8 +20,9 @@ def parseAnswer(answer):
         x = 0
         for klient in root:
             telefon = klient.find('./DaneKontaktowe/Telefon').text
-            if telefon is None:
-                continue
+            if withPhones:
+                if telefon is None:
+                    continue
             x += 1
             nip = klient.find('./DanePodstawowe/NIP').text
             firma = klient.find('./DanePodstawowe/Firma').text

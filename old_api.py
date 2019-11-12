@@ -14,7 +14,7 @@ dataOd = '2019-11-06'
 dataDo = '2019-11-06'
 
 response = client.service.GetMigrationData201901(
-    token, DateFrom=dataOd, DateTo=dataDo)
+    token, DateFrom=dataOd, DateTo=dataDo, City=['Toruń'])
 
 root = ET.fromstring(response)
 

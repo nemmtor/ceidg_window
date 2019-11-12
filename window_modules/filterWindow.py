@@ -32,6 +32,7 @@ class Filter(Window):
         side_frame = tk.Frame(self.root)
         # Vars
         self.filterPkd_var = tk.IntVar(value=0)
+        self.filterCity_var = tk.IntVar(value=0)
         self.filterPhone_var = tk.IntVar(value=0)
         # Checkboxes
         filterPkd = tk.Checkbutton(side_frame,
@@ -40,12 +41,19 @@ class Filter(Window):
                                    font=Window.useFont(8),
                                    command=lambda: self.toggleEntry(
                                        self.pkd_entry, self.filterPkd_var))
+        filterCity = tk.Checkbutton(side_frame,
+                                  text='Filtruj po\nmiastach',
+                                  variable=self.filterCity_var,
+                                  font=Window.useFont(8),
+                                  command=lambda: self.toggleEntry(
+                                      self.city_entry, self.filterCity_var))
         filterPhone = tk.Checkbutton(side_frame,
                                      text='Tylko z\nnumerami',
                                      variable=self.filterPhone_var,
                                      font=Window.useFont(8))
         # Entries
         self.pkd_entry = tk.Entry(side_frame, width=10, state="disabled")
+        self.city_entry = tk.Entry(side_frame, width=10, state="disabled")
 
         # Main frame pack
         dateFrom_label.pack()
@@ -59,20 +67,25 @@ class Filter(Window):
         filterPhone.pack()
         filterPkd.pack()
         self.pkd_entry.pack()
+        filterCity.pack()
+        self.city_entry.pack()
         side_frame.pack(padx=10, pady=(5, 15))
 
     def filterRequest(self):
         dateFrom = self.dateFrom_entry.get().strip()
         dateTo = self.dateTo_entry.get().strip()
         kwargs = {}
-        if self.filterPkd_var:
+        withPhones = False
+        if self.filterPhone_var.get():
+            withPhones = True
+        if self.filterPkd_var.get():
             PKD = self.pkd_entry.get().strip().split(',')
             kwargs['PKD'] = self.pkd_entry.get().strip().split(',')
-            # answer = api.apiRequest(dateFrom, dateTo, PKD=PKD)
-        # else:
-        #     answer = api.apiRequest(dateFrom, dateTo)
-        answer = api.apiRequest(dateFrom, dateTo, **kwargs)
-        parseAnswer(answer)
+        if self.filterCity_var.get():
+            kwargs['City'] = self.city_entry.get().strip().split(',')
+        answer = api.apiRequest(dateFrom, dateTo,**kwargs)
+        # Excel
+        parseAnswer(answer, withPhones)
         self.root.destroy()
         # Here some message BOX
 
