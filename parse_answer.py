@@ -29,8 +29,16 @@ def parseAnswer(answers, withPhones):
                 firma = klient.find('./DanePodstawowe/Firma').text
                 imnaz = f'{klient.find("./DanePodstawowe/Imie").text} {klient.find("./DanePodstawowe/Nazwisko").text}'
                 mail = klient.find('./DaneKontaktowe/AdresPocztyElektronicznej').text
-                miejsc = [miejsc.text for miejsc in klient.findall('./DaneAdresowe//Miejscowosc') if miejsc.text is not None][0]
-                woj = [woj.text for woj in klient.findall('./DaneAdresowe//Wojewodztwo') if woj.text is not None][0]
+                miejsc = [miejsc.text for miejsc in klient.findall('./DaneAdresowe//Miejscowosc') if miejsc.text is not None]
+                if len(miejsc) > 0:
+                    miejsc = miejsc[0]
+                else:
+                    miejsc = ''
+                woj = [woj.text for woj in klient.findall('./DaneAdresowe//Wojewodztwo') if woj.text is not None]
+                if len(woj) > 0:
+                    woj = woj[0]
+                else:
+                    woj = ''
                 data_rozp = klient.find('./DaneDodatkowe/DataRozpoczeciaWykonywaniaDzialalnosciGospodarczej').text
                 status = klient.find('./DaneDodatkowe/Status').text
                 pkd = klient.find('./DaneDodatkowe/KodyPKD').text
