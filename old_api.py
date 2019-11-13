@@ -10,11 +10,11 @@ client = Client(api, settings=settings)
 token = 'xCPw8Jxe/E+czZVIEPUPZaZb5SZx+itfymdEe5BxdSrOZS+5SunR93+hi/pXePb8'
 
 
-dataOd = '2019-11-06'
-dataDo = '2019-11-06'
+dataOd = '2019-10-01'
+dataDo = '2019-10-01'
 
 response = client.service.GetMigrationData201901(
-    token, DateFrom=dataOd, DateTo=dataDo, City=['Toruń'])
+    token, DateFrom=dataOd, DateTo=dataDo)
 
 root = ET.fromstring(response)
 

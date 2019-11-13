@@ -2,6 +2,7 @@ import tkinter as tk
 from .mainWindow import Window
 from api_call import api
 from parse_answer import parseAnswer
+import datetime as dt
 
 
 class Filter(Window):
@@ -42,11 +43,11 @@ class Filter(Window):
                                    command=lambda: self.toggleEntry(
                                        self.pkd_entry, self.filterPkd_var))
         filterCity = tk.Checkbutton(side_frame,
-                                  text='Filtruj po\nmiastach',
-                                  variable=self.filterCity_var,
-                                  font=Window.useFont(8),
-                                  command=lambda: self.toggleEntry(
-                                      self.city_entry, self.filterCity_var))
+                                    text='Filtruj po\nmiastach',
+                                    variable=self.filterCity_var,
+                                    font=Window.useFont(8),
+                                    command=lambda: self.toggleEntry(
+                                        self.city_entry, self.filterCity_var))
         filterPhone = tk.Checkbutton(side_frame,
                                      text='Tylko z\nnumerami',
                                      variable=self.filterPhone_var,
@@ -72,20 +73,39 @@ class Filter(Window):
         side_frame.pack(padx=10, pady=(5, 15))
 
     def filterRequest(self):
-        dateFrom = self.dateFrom_entry.get().strip()
-        dateTo = self.dateTo_entry.get().strip()
+        dateFrom = dt.datetime.strptime(
+            self.dateFrom_entry.get().strip(), '%Y-%m-%d')
+        dateTo = dt.datetime.strptime(
+            self.dateTo_entry.get().strip(), '%Y-%m-%d')
         kwargs = {}
         withPhones = False
         if self.filterPhone_var.get():
             withPhones = True
         if self.filterPkd_var.get():
-            PKD = self.pkd_entry.get().strip().split(',')
             kwargs['PKD'] = self.pkd_entry.get().strip().split(',')
         if self.filterCity_var.get():
             kwargs['City'] = self.city_entry.get().strip().split(',')
-        answer = api.apiRequest(dateFrom, dateTo,**kwargs)
-        # Excel
-        parseAnswer(answer, withPhones)
+        if (dateFrom.year == dateTo.year) and (dateFrom.month == dateTo.month):
+            daysCount = dateTo.day - dateFrom.day
+            if dateFrom.month < 10:
+                month = f'0{dateFrom.month}'
+            else:
+                month = dateFrom.month
+        answers = []
+        if daysCount > 0:
+            for day in range(dateFrom.day, dateFrom.day + daysCount + 1):
+                if day < 10:
+                    day = f'0{day}'
+
+                answers.append(api.apiRequest(
+                    f'{dateFrom.year}-{month}-{day}',
+                    f'{dateFrom.year}-{month}-{day}',
+                    **kwargs))
+                print(f'Finished: {dateFrom.year}-{month}-{day}')
+
+        # answer = api.apiRequest(dateFrom, dateTo, **kwargs)
+        # # Excel
+        parseAnswer(answers, withPhones)
         self.root.destroy()
         # Here some message BOX
 

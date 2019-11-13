@@ -18,6 +18,7 @@ class Api:
 
     def apiRequest(self, dateFrom, dateTo, **kwargs):
         '''Send request to API.'''
+
         return self.client.service.GetMigrationData201901(
             config.readApiToken(), DateFrom=dateFrom, DateTo=dateTo, **kwargs)
 
