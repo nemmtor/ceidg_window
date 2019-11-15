@@ -1,8 +1,10 @@
 import configparser
 import os
 
+
 class Config():
     '''Create Read Update Delete config files'''
+
     def loadConfig(self):
         '''Load config from file.'''
         self.config = configparser.ConfigParser()
@@ -24,5 +26,6 @@ class Config():
     def checkConfigExists():
         '''Check if config file exists in directory'''
         return os.path.exists('./config.ini')
+
 
 config = Config()

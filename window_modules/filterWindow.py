@@ -1,8 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from .mainWindow import Window
-from api_call import api
-from parse_answer import parseAnswer
+from ceidg_api import api
 import datetime as dt
 
 
@@ -34,7 +33,6 @@ class Filter(Window):
         side_frame = tk.Frame(self.root)
         # Vars
         self.filterPkd_var = tk.IntVar(value=0)
-        self.filterCity_var = tk.IntVar(value=0)
         self.filterPhone_var = tk.IntVar(value=0)
         # Checkboxes
         filterPkd = tk.Checkbutton(side_frame,
@@ -43,19 +41,12 @@ class Filter(Window):
                                    font=Window.useFont(8),
                                    command=lambda: self.toggleEntry(
                                        self.pkd_entry, self.filterPkd_var))
-        filterCity = tk.Checkbutton(side_frame,
-                                    text='Filtruj po\nmieście',
-                                    variable=self.filterCity_var,
-                                    font=Window.useFont(8),
-                                    command=lambda: self.toggleEntry(
-                                        self.city_entry, self.filterCity_var))
         filterPhone = tk.Checkbutton(side_frame,
                                      text='Tylko z\nnumerami',
                                      variable=self.filterPhone_var,
                                      font=Window.useFont(8))
         # Entries
         self.pkd_entry = tk.Entry(side_frame, width=10, state="disabled")
-        self.city_entry = tk.Entry(side_frame, width=10, state="disabled")
 
         # Main frame pack
         dateFrom_label.pack()
@@ -69,8 +60,6 @@ class Filter(Window):
         filterPhone.pack()
         filterPkd.pack()
         self.pkd_entry.pack()
-        filterCity.pack()
-        self.city_entry.pack()
         side_frame.pack(padx=10, pady=(5, 15))
 
     def checkDate(self):
@@ -80,47 +69,18 @@ class Filter(Window):
                 self.dateFrom_entry.get().strip(), '%Y-%m-%d')
             dateTo = dt.datetime.strptime(
                 self.dateTo_entry.get().strip(), '%Y-%m-%d')
-            filledGood=True
+            filledGood = True
         except ValueError:
             filledGood = False
-            print(ValueError)
         if filledGood:
-            messagebox.showinfo('Wait', 'Waiting for api response...')
-            self.filterRequest(dateFrom, dateTo)
+            api.filterRequest(dateFrom, dateTo,
+                              self.filterPhone_var.get(),
+                              self.filterPkd_var.get(),
+                              self.pkd_entry.get().strip())
+
+            self.root.destroy()
         else:
             messagebox.showinfo('Error', 'Wrong date')
-
-    def filterRequest(self, dateFrom, dateTo):
-        kwargs = {}
-        withPhones = False
-        filterPkd = False
-        if self.filterPhone_var.get():
-            withPhones = True
-        if self.filterPkd_var.get():
-            kwargs['PKD'] = self.pkd_entry.get().strip().split(',')
-            filterPkd = True
-        if self.filterCity_var.get():
-            kwargs['City'] = self.city_entry.get().strip().split(',')
-        answers = []
-        if (dateFrom.year == dateTo.year) and (dateFrom.month == dateTo.month):
-            daysCount = dateTo.day - dateFrom.day
-            if dateFrom.month < 10:
-                month = f'0{dateFrom.month}'
-            else:
-                month = dateFrom.month
-            for day in range(dateFrom.day, dateFrom.day + daysCount + 1):
-                if day < 10:
-                    day = f'0{day}'
-
-                answers.append(api.apiRequest(
-                    f'{dateFrom.year}-{month}-{day}',
-                    f'{dateFrom.year}-{month}-{day}',
-                    **kwargs))
-                print(f'Finished: {dateFrom.year}-{month}-{day}')
-        # # Excel
-        parseAnswer(answers, withPhones, filterPkd)
-        self.root.destroy()
-        # Here some message BOX
 
     def toggleEntry(self, entry, var):
         if var.get() == 1:

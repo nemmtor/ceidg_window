@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
-from api_call import api
+from ceidg_api import api
 from .mainWindow import Window
 from config_parser import config
 
@@ -11,7 +11,6 @@ class Auth(Window):
         self.createWidgets()
         self.centerWindow(self.root)
 
-
     def createWidgets(self):
         '''Create Frames, labels, entries, buttons etc.'''
         # Frames
@@ -21,10 +20,11 @@ class Auth(Window):
         # Entries
         self.token_entry = tk.Entry(
             main_frame, width=30)
-            # Buttons
+        # Buttons
         submit = tk.Button(main_frame, text='Sprawdź token', width=10,
                            padx=10, font=Window.useFont(12),
-                           command=lambda: self.checkToken(self.token_entry.get().strip()))
+                           command=lambda: self.checkToken(
+                               self.token_entry.get().strip()))
 
         # Pack
         token_label.pack()

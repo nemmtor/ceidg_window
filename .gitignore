@@ -4,3 +4,4 @@ wyniki/*.xlsx
 wyniki/*.csv
 build
 dist
+venv

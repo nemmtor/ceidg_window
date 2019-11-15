@@ -1,12 +1,12 @@
-from window_modules import Auth, Filter
+from window_modules import Auth, Filter, Loading
 from config_parser import config
-from api_call import api
+from ceidg_api import api
 from verifyLicence import isGenuine
 import os
 import sys
 
-print(isGenuine)
 if not isGenuine:
+    '''Run TurboActive if licence is not activated.'''
     os.system("TurboActivate.exe")
     sys.exit()
 if isGenuine:
@@ -21,9 +21,11 @@ if isGenuine:
             auth = Auth('API Token Authorization')
             auth.root.mainloop()
 
-
+    # Main App Window
     filter = Filter('Api Filtr Service')
     filter.root.mainloop()
-
-else:
-    print('Not valid licence!')
+    # if api.startedRequest:
+    #     loading = Loading('Loading...')
+    #     loading.mainloop()
+    #     if api.finishedRequest:
+    #         loading.destroy()

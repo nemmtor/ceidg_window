@@ -2,6 +2,7 @@ import tkinter as tk
 import sys
 import os
 
+
 class Window:
     '''Parent class to inherit from'''
 
@@ -12,8 +13,7 @@ class Window:
         self.root.option_add('*Dialog.msg.font', Window.useFont(12))
         self.root.protocol('WM_DELETE_WINDOW', lambda: self.xButton())
         self.root.tk.call('wm', 'iconphoto', self.root._w,
-                       tk.PhotoImage(file=self.getIcon('./logo.png')))
-
+                          tk.PhotoImage(file=self.getIcon('./logo.png')))
 
     def centerWindow(self, window):
         '''Move window to center.'''
