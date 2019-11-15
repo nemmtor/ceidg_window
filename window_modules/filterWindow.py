@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 from .mainWindow import Window
 from api_call import api
 from parse_answer import parseAnswer
@@ -26,7 +27,7 @@ class Filter(Window):
         # Buttons
         submit = tk.Button(main_frame, text='Filtruj', width=10,
                            padx=10, font=Window.useFont(12),
-                           command=lambda: self.filterRequest())
+                           command=lambda: self.checkDate())
 
         # Side frame
         # Frames
@@ -37,13 +38,13 @@ class Filter(Window):
         self.filterPhone_var = tk.IntVar(value=0)
         # Checkboxes
         filterPkd = tk.Checkbutton(side_frame,
-                                   text='Filtruj po\nPKD',
+                                   text='Filtruj po\ngłównym PKD',
                                    variable=self.filterPkd_var,
                                    font=Window.useFont(8),
                                    command=lambda: self.toggleEntry(
                                        self.pkd_entry, self.filterPkd_var))
         filterCity = tk.Checkbutton(side_frame,
-                                    text='Filtruj po\nmiastach',
+                                    text='Filtruj po\nmieście',
                                     variable=self.filterCity_var,
                                     font=Window.useFont(8),
                                     command=lambda: self.toggleEntry(
@@ -72,27 +73,41 @@ class Filter(Window):
         self.city_entry.pack()
         side_frame.pack(padx=10, pady=(5, 15))
 
-    def filterRequest(self):
-        dateFrom = dt.datetime.strptime(
-            self.dateFrom_entry.get().strip(), '%Y-%m-%d')
-        dateTo = dt.datetime.strptime(
-            self.dateTo_entry.get().strip(), '%Y-%m-%d')
+    def checkDate(self):
+        filledGood = False
+        try:
+            dateFrom = dt.datetime.strptime(
+                self.dateFrom_entry.get().strip(), '%Y-%m-%d')
+            dateTo = dt.datetime.strptime(
+                self.dateTo_entry.get().strip(), '%Y-%m-%d')
+            filledGood=True
+        except ValueError:
+            filledGood = False
+            print(ValueError)
+        if filledGood:
+            messagebox.showinfo('Wait', 'Waiting for api response...')
+            self.filterRequest(dateFrom, dateTo)
+        else:
+            messagebox.showinfo('Error', 'Wrong date')
+
+    def filterRequest(self, dateFrom, dateTo):
         kwargs = {}
         withPhones = False
+        filterPkd = False
         if self.filterPhone_var.get():
             withPhones = True
         if self.filterPkd_var.get():
             kwargs['PKD'] = self.pkd_entry.get().strip().split(',')
+            filterPkd = True
         if self.filterCity_var.get():
             kwargs['City'] = self.city_entry.get().strip().split(',')
+        answers = []
         if (dateFrom.year == dateTo.year) and (dateFrom.month == dateTo.month):
             daysCount = dateTo.day - dateFrom.day
             if dateFrom.month < 10:
                 month = f'0{dateFrom.month}'
             else:
                 month = dateFrom.month
-        answers = []
-        if daysCount > 0:
             for day in range(dateFrom.day, dateFrom.day + daysCount + 1):
                 if day < 10:
                     day = f'0{day}'
@@ -102,10 +117,8 @@ class Filter(Window):
                     f'{dateFrom.year}-{month}-{day}',
                     **kwargs))
                 print(f'Finished: {dateFrom.year}-{month}-{day}')
-
-        # answer = api.apiRequest(dateFrom, dateTo, **kwargs)
         # # Excel
-        parseAnswer(answers, withPhones)
+        parseAnswer(answers, withPhones, filterPkd)
         self.root.destroy()
         # Here some message BOX
 

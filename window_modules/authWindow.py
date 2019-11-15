@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 from api_call import api
 from .mainWindow import Window
 from config_parser import config
@@ -8,6 +9,7 @@ class Auth(Window):
     def __init__(self, title):
         super().__init__(title)
         self.createWidgets()
+        self.centerWindow(self.root)
 
 
     def createWidgets(self):
@@ -34,8 +36,8 @@ class Auth(Window):
         '''Check if given token is correct.'''
         if api.validateToken(token):
             config.createConfig(token)
-            # Here some message BOX
+            messagebox.showinfo('Sukces', 'Poprawny token.')
             self.root.destroy()
         else:
             # Here some message BOX
-            print('Error!')
+            messagebox.showinfo('Error', 'Niepoprawny token.')

@@ -3,9 +3,6 @@ import os
 
 class Config():
     '''Create Read Update Delete config files'''
-    def __init__(self):
-        print('Trying to load config file...')
-
     def loadConfig(self):
         '''Load config from file.'''
         self.config = configparser.ConfigParser()

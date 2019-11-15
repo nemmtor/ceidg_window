@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 import xlwt
 
 
-def parseAnswer(answers, withPhones):
+def parseAnswer(answers, withPhones, filterPkd):
         wb = xlwt.Workbook()
         sheet = wb.add_sheet('Wynik', cell_overwrite_ok=True)
         sheet.write(0, 0, 'NIP')
@@ -24,6 +24,8 @@ def parseAnswer(answers, withPhones):
                 if withPhones:
                     if telefon is None:
                         continue
+                pkd = klient.find('./DaneDodatkowe/KodyPKD').text.split(',')
+                print(pkd)
                 x += 1
                 nip = klient.find('./DanePodstawowe/NIP').text
                 firma = klient.find('./DanePodstawowe/Firma').text
@@ -41,8 +43,6 @@ def parseAnswer(answers, withPhones):
                     woj = ''
                 data_rozp = klient.find('./DaneDodatkowe/DataRozpoczeciaWykonywaniaDzialalnosciGospodarczej').text
                 status = klient.find('./DaneDodatkowe/Status').text
-                pkd = klient.find('./DaneDodatkowe/KodyPKD').text
-
                 sheet.write(x, 0, nip)
                 sheet.write(x, 1, firma)
                 sheet.write(x, 2, imnaz)
