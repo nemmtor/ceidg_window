@@ -54,6 +54,7 @@ class Parser:
                 excel.writeData(resultCounter, 7, data_rozp)
                 excel.writeData(resultCounter, 8, status)
                 excel.writeData(resultCounter, 9, pkd)
+        print(f'Finished! Found: {resultCounter}')
         excel.saveFile()
 
 

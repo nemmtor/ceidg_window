@@ -1,6 +1,8 @@
 from zeep import Client, Settings
 from config_parser import config
 from .xmlparser import parser
+import datetime as dt
+from calendar import monthrange
 
 
 class Api:
@@ -12,7 +14,15 @@ class Api:
 
     def __init__(self):
         self.startedRequest = False
-        self.finishedRequest = False
+        self.dateFrom = ''
+        self.dateTo = ''
+        self.withPhones = ''
+        self.withPkd = ''
+        self.pkdData = ''
+        self.withStatus = 0
+        # test = Api.client.get_element('ns0:GetMigrationData201901')
+        # self.status = test(status=[1, 2])
+        # print(self.status)
 
     def apiRequest(self, dateFrom, dateTo, **kwargs):
         '''Send request to API.'''
@@ -32,19 +42,27 @@ class Api:
         else:
             return True
 
-    def filterRequest(self, dateFrom, dateTo, withPhones, withPkd, dataPkd):
-        self.startedRequest = True
+    def filterRequest(self):
+        dateFrom = dt.datetime.strptime(
+            self.dateFrom, '%Y-%m-%d')
+        dateTo = dt.datetime.strptime(
+            self.dateTo, '%Y-%m-%d')
         kwargs = {}
-        if withPkd:
-            kwargs['PKD'] = dataPkd
+        if self.withPkd:
+            kwargs['PKD'] = self.pkdData
+        if self.withStatus:
+            kwargs['status'] = 1
+            # kwargs['status'] = self.status
         answers = []
         # Request for every day
         if (dateFrom.year == dateTo.year) and (dateFrom.month == dateTo.month):
+            print('Method 1')
             daysCount = dateTo.day - dateFrom.day
             if dateFrom.month < 10:
                 month = f'0{dateFrom.month}'
             else:
                 month = dateFrom.month
+
             for day in range(dateFrom.day, dateFrom.day + daysCount + 1):
                 if day < 10:
                     day = f'0{day}'
@@ -54,5 +72,43 @@ class Api:
                     f'{dateFrom.year}-{month}-{day}',
                     **kwargs))
                 print(f'Finished: {dateFrom.year}-{month}-{day}')
-        self.finishedRequest = True
-        parser.parseAnswer(answers, withPhones, withPkd, **kwargs)
+
+        elif (dateFrom.year == dateTo.year) and not (dateFrom.month == dateTo.month):
+            dates = []
+            monthsCount = dateTo.month - dateFrom.month
+            # First month
+            month = dateFrom.month
+            if month < 10:
+                month = f'0{month}'
+            for day in range(dateFrom.day, monthrange(dateFrom.year, int(month))[1] + 1):
+                if day < 10:
+                    day = f'0{day}'
+                date = f'{dateFrom.year}-{month}-{day}'
+                dates.append(date)
+            # Next months
+            if monthsCount > 1:
+                for month in range(dateFrom.month+1, dateTo.month):
+                    if month < 10:
+                        month = f'0{month}'
+                    for day in range(1, monthrange(dateFrom.year, int(month))[1] + 1):
+                        if day < 10:
+                            day = f'0{day}'
+                        date = f'{dateFrom.year}-{month}-{day}'
+                        dates.append(date)
+            # Last month
+            month = dateTo.month
+            if month < 10:
+                month = f'0{month}'
+            for day in range(1, dateTo.day + 1):
+                if day < 10:
+                    day = f'0{day}'
+                date = f'{dateTo.year}-{month}-{day}'
+                dates.append(date)
+            for date in dates:
+                print(f'Starting: {date}')
+                answers.append(self.apiRequest(
+                    date,
+                    date,
+                    **kwargs))
+                print(f'Finished')
+        parser.parseAnswer(answers, self.withPhones, self.withPkd, **kwargs)

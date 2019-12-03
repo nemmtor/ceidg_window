@@ -37,5 +37,5 @@ class Excel:
             filetypes=[
             ("Plik excel", "*.xls")],
             defaultextension="*.xls")
-        self.wb.save(filePath + '.xls')
+        self.wb.save(filePath)
         root.destroy()

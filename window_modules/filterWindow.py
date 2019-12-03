@@ -34,6 +34,7 @@ class Filter(Window):
         # Vars
         self.filterPkd_var = tk.IntVar(value=0)
         self.filterPhone_var = tk.IntVar(value=0)
+        self.filterStatus_var = tk.IntVar(value=0)
         # Checkboxes
         filterPkd = tk.Checkbutton(side_frame,
                                    text='Filtruj po\ngłównym PKD',
@@ -45,6 +46,10 @@ class Filter(Window):
                                      text='Tylko z\nnumerami',
                                      variable=self.filterPhone_var,
                                      font=Window.useFont(8))
+        filterStatus = tk.Checkbutton(side_frame,
+                                      text="Tylko aktywne",
+                                      variable=self.filterStatus_var,
+                                      font=Window.useFont(8))
         # Entries
         self.pkd_entry = tk.Entry(side_frame, width=10, state="disabled")
 
@@ -58,6 +63,7 @@ class Filter(Window):
 
         # Side frame pack
         filterPhone.pack()
+        filterStatus.pack()
         filterPkd.pack()
         self.pkd_entry.pack()
         side_frame.pack(padx=10, pady=(5, 15))
@@ -65,19 +71,21 @@ class Filter(Window):
     def checkDate(self):
         filledGood = False
         try:
-            dateFrom = dt.datetime.strptime(
+            dt.datetime.strptime(
                 self.dateFrom_entry.get().strip(), '%Y-%m-%d')
-            dateTo = dt.datetime.strptime(
+            dt.datetime.strptime(
                 self.dateTo_entry.get().strip(), '%Y-%m-%d')
             filledGood = True
         except ValueError:
             filledGood = False
         if filledGood:
-            api.filterRequest(dateFrom, dateTo,
-                              self.filterPhone_var.get(),
-                              self.filterPkd_var.get(),
-                              self.pkd_entry.get().strip())
-
+            api.dateFrom = self.dateFrom_entry.get().strip()
+            api.dateTo = self.dateTo_entry.get().strip()
+            api.withPhones = self.filterPhone_var.get()
+            api.withPkd = self.filterPkd_var.get()
+            api.pkdData = self.pkd_entry.get().strip()
+            api.withStatus = self.filterStatus_var.get()
+            api.startedRequest = True
             self.root.destroy()
         else:
             messagebox.showinfo('Error', 'Wrong date')
