@@ -17,7 +17,10 @@ class Parser:
                     if telefon is None:
                         continue
                 pkd = klient.find('./DaneDodatkowe/KodyPKD').text
-                pkdCheck = pkd.split(',')
+                if pkd != None:
+                    pkdCheck = pkd.split(',')
+                else:
+                    pkdCheck = 'Brak'
                 if withPkd:
                     if pkdCheck[0] != kwargs['PKD']:
                         continue
