@@ -16,8 +16,12 @@ class Parser:
                 if withPhones:
                     if telefon is None:
                         continue
+                # Firmy tylko bez numerow telefonow!
+                else:
+                    if telefon is not None:
+                        continue
                 pkd = klient.find('./DaneDodatkowe/KodyPKD').text
-                if pkd != None:
+                if pkd is not None:
                     pkdCheck = pkd.split(',')
                 else:
                     pkdCheck = 'Brak'
